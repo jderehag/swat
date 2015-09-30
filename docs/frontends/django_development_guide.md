@@ -52,7 +52,7 @@ you to easily install them.
 2. Install the npm dependencies using *npm install*. All of the required packages should be installed in a new directory *node_modules*.
 Now you can start building using gulp by calling *./node_modules/gulp/bin/gulp.js* in the static directory.
 
-        cd $PROJECT_ROOT/Plotters/www/MetricsViewer/visualization/static/visualization/
+        cd $ROOT/www/MetricsViewer/visualization/static/visualization/
         npm install
         ./node_modules/gulp/bin/gulp.js
 
@@ -69,7 +69,7 @@ Saves the dependency as a development dependency. Meaning that in order to devel
 that package. **Usually** this is what you need as all of our deployment dependencies and libraries are downloaded as standalone files
 and saved in
 
-        $PROJECT_ROOT/Plotters/www/MetricsViewer/visualization/static/visualization/lib
+        $ROOT/www/MetricsViewer/visualization/static/visualization/lib
 
 
 ##The frontend development tools
@@ -81,7 +81,7 @@ your site when any changes occur during development.
 
 If you have followed the npm installation instructions above, a local gulp installation can be executed by calling
 
-        ./$PROJECT_ROOT/Plotters/www/MetricsViewer/visualization/static/visualization/node_modules/gul/bin/gulp.js
+        ./$ROOT/www/MetricsViewer/visualization/static/visualization/node_modules/gul/bin/gulp.js
 
 The following gulp commands are available
 

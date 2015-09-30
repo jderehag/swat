@@ -26,17 +26,12 @@
 ## General installation
 ### requirements
 ####python requirements
-   1. [Python 2.7](https://www.python.org/downloads/)  
+   1. [>=Python 2.7.10](https://www.python.org/downloads/)  
    2. [pip](https://www.python.org/downloads/)  
       Pip should be installed together with Python as of 2.7.9
    3. Install additional python requirements by doing:
 
-        $>pip install -r ROOT/Plotters/www/MetricsViewer/pip-requirements.py  
-
-    Note that in order to run the application against a MySQL database you need to install *python-dev* and *libmysqlclient-dev*.
-    On Linux these libraries can usually be found in the distribution repositories.
-    For Windows the python-dev package should be included with the installation and the MySQL connector library can be found at:
-    [https://dev.mysql.com/downloads/connector/c/]()
+        $>pip install -r pip-requirements.py  
 
 
 ### project configuration
@@ -46,28 +41,23 @@
 
 2. Configure **MAINTAINERS**  
    This file contains a list of all subsystems (a list of inclusion/exclusion pattern rules).
-3. Configure **SRC_ROOTS**  
-   This file contains a list of paths to look through when reading and analyzing files.
-   You could also add exclusion paths here. 
-
 
 ## Creating a database and doing analysis of repo
-Creating a database is done through the script **ROOT/DbAPI/\_MetricsDb/db\_update.py**  
-You can either cumulatively update, or analyze everything as defined in SRC_ROOTS.
+Creating a database is done through the script **ROOT/analyze.py**  
+You can either cumulatively update, or analyze everything as defined in project.config.
 If you are analyzing a git repo, you should also define the repo_root in the project.config file (under 
-db_update section). When that script is done, it will have created sqlite database in 
-**ROOT/DbAPI/databases/metrics.db**
+db_update section). 
 
 ## Running the www frontend
 The www frontend is based on the [django web framework](https://www.djangoproject.com/)
 You first need to configure django to be able to run the development server, you do that by:
 
-1. Copy **ROOT/Plotters/www/MetricsViewer/MetricsViewer/local_settings.py.example** -> **ROOT/Plotters/www/MetricsViewer/MetricsViewer/local_settings.py**  
+1. Copy **ROOT/www/MetricsViewer/MetricsViewer/local_settings.py.example** -> **ROOT/www/MetricsViewer/MetricsViewer/local_settings.py**  
    Follow the comments inside that file on how to properly configure it.  
 2. Start the server  
-   It will use whatever database as defined in **project.config::[MetricsViewer][dbtype]**
+   It will use whatever database as defined in **project.config::[MetricsViewer][engine_url]**
 
-        $>python ROOT/Plotters/www/MetricsViewer/manage.py runserver  
+        $>python ROOT/www/MetricsViewer/manage.py runserver  
 
    By default, the development server will start to listen on http://localhost:8000
 
