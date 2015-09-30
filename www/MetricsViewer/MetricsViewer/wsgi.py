@@ -1,21 +1,4 @@
-sw-analytics toolkit licensing Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
-August 6, 2015
-
-This software is distributed under 2-clause BSD license. See Appendix 1 (in this file) for details.
-
-All python 3:rd party libraries are pulled in through pip (or the package manager of your choice), thus any derivative
-licensing does not apply.
-
-There are however some javascript 3:rd party libraries distributed with this software, located under:
-Plotters/www/MetricsViewer/visualization/lib/
-Each included library have a copy of the license in the same folder as the library itself.
-All of them are either MIT or BSD licenses, however for details about each library I would recommend you to read
-the included license file in each folder.
-
-
-
-Appendix 1: 
------------------------------------------------------------------------------------------------------------------------
+'''
 Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
 All rights reserved.
 
@@ -35,3 +18,20 @@ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PRO
 OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
+
+Short description:
+  WSGI config for MetricsViewer project.
+
+  It exposes the WSGI callable as a module-level variable named ``application``.
+
+  For more information on this file, see
+  https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
+'''
+
+import os
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "MetricsViewer.settings")
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()

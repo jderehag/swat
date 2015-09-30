@@ -1,0 +1,22 @@
+###################
+# General
+###################
+*.pyc
+*.log
+
+###################
+# Database stuff
+###################
+*.db
+DbAPI/databases
+*.pickle
+project.config
+
+###################
+# IDE/Editor files
+###################
+.idea
+*.swp
+tags
+.project
+.pydevproject

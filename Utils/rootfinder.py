@@ -1,21 +1,4 @@
-sw-analytics toolkit licensing Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
-August 6, 2015
-
-This software is distributed under 2-clause BSD license. See Appendix 1 (in this file) for details.
-
-All python 3:rd party libraries are pulled in through pip (or the package manager of your choice), thus any derivative
-licensing does not apply.
-
-There are however some javascript 3:rd party libraries distributed with this software, located under:
-Plotters/www/MetricsViewer/visualization/lib/
-Each included library have a copy of the license in the same folder as the library itself.
-All of them are either MIT or BSD licenses, however for details about each library I would recommend you to read
-the included license file in each folder.
-
-
-
-Appendix 1: 
------------------------------------------------------------------------------------------------------------------------
+'''
 Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
 All rights reserved.
 
@@ -35,3 +18,38 @@ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PRO
 OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
+
+Short description:
+  Simple convinience script for finding root folder of the repo.
+  Typically, create a symlink __init__.py -> Utils/rootfinder.py, and as soon as that package is imported, this
+  file will make sure that the root path is in sys.path.
+  If you want to add custom things into your init, instead of creating a symlink make sure to import this file from
+  that custom __init__, and it will still be able to set up sys.path
+'''
+
+import os
+import sys
+
+
+def find_repo_rootdir():
+    '''
+    Finds the repo:s rootdir by looking for the marker file .THIS_IS_ROOT
+    It then returns the absolute path to the repo root
+    '''
+    def __check_parent(topdir):
+        for _, _, files in os.walk(topdir):
+            if '.THIS_IS_ROOT' in files:
+                return topdir
+            else:
+                next_ = topdir.rsplit("/", 1)
+                if len(next_) == 2:
+                    return __check_parent(next_[0])
+                else:
+                    return None
+    return __check_parent(os.path.abspath(os.path.dirname(__file__)))
+
+repo_root = find_repo_rootdir()
+if repo_root is not None and repo_root not in sys.path:
+    sys.path.append(repo_root)

@@ -1,21 +1,4 @@
-sw-analytics toolkit licensing Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
-August 6, 2015
-
-This software is distributed under 2-clause BSD license. See Appendix 1 (in this file) for details.
-
-All python 3:rd party libraries are pulled in through pip (or the package manager of your choice), thus any derivative
-licensing does not apply.
-
-There are however some javascript 3:rd party libraries distributed with this software, located under:
-Plotters/www/MetricsViewer/visualization/lib/
-Each included library have a copy of the license in the same folder as the library itself.
-All of them are either MIT or BSD licenses, however for details about each library I would recommend you to read
-the included license file in each folder.
-
-
-
-Appendix 1: 
------------------------------------------------------------------------------------------------------------------------
+'''
 Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
 All rights reserved.
 
@@ -35,3 +18,41 @@ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PRO
 OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
+
+Short description:
+'''
+import re
+import os
+
+
+class EnvPathParser(object):
+    '''
+    Handles translation of paths, from/to absolute paths to paths containing env. variables
+    This will hopefully be removed in the future
+    '''
+    def __init__(self):
+        self._translated_envs = {}
+
+    def parse(self, path):
+        '''
+        Parses path for environment variables
+        '''
+        match = re.match(r'.*\$(\w+).*', path)
+        if match is not None and match.group(1) is not None:
+            try:
+                path = path.replace("$" + match.group(1), os.environ[match.group(1)])
+                self._translated_envs[match.group(1)] = os.environ[match.group(1)]
+            except KeyError:
+                pass
+        return path
+
+    def translate_to_env(self, path):
+        '''
+        Takes an absolute path and translates it into original form including env. variables
+        '''
+        for envname, envpath in self._translated_envs.iteritems():
+            if envpath in path:
+                path = path.replace(envpath, "$" + envname)
+        return path

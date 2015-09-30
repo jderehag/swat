@@ -1,0 +1,129 @@
+#######################################################################################################################
+#
+# Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this list of conditions
+# and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+# disclaimer in the documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# **************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *****************
+#
+# Short description:
+#   This is a template/example file for project wide configurations
+#   It conforms to RFC 822 <http://tools.ietf.org/html/rfc822.html>
+#   (e.g. subset of Windows INI format)
+#
+#   To make a default config file, save it as "project.config" in repo root, and it will automatically be used, and 
+#   ignored from a git perspective (it wont be checked in).
+#
+#######################################################################################################################
+[General]
+maintainers: ./MAINTAINERS
+
+# defect_modification_regexp defines a regular expression to be applied to the VCS to mark versions
+# as either defect_modifications or *not* (where *not* would indicate for instance feature development).
+# All VCS version descriptions are transformed into lowercase to make the regular expressions simpler, so
+# any regular expression do not need to take CASE into account.
+# Python regular expression syntax is assumed.
+# You can choose to differantiate between searching all, subject and/or body and evaluation is based on
+# either (all) OR (subject and/or body), where subject would be evaluated first and body next.
+# To optionally store defect_id as marked in the version log, create one-or more matching groups
+# (results from groups must be identical!), or if regexp is lacking a group, then the defect name will
+# be randomized and impossible to match against any CMS.
+defect_modification_regexp_all: .*bug:.*|*fix(?:es)?:.*
+#defect_modification_regexp_subject: .*bug:.*|.*fix(?:es)?:.*
+#defect_modification_regexp_body: .*bug:.*|.*fix(?:es)?:.*
+
+# Defines a list of branch names to be considered as LSV branches (Latest-System-Version).
+# These will all be analyzed and aggregated into the same database and change_metric time series.
+# Defaults to main
+# lsv_branches: main
+
+# Optional: Skips any VCS element if it was created by defined users.
+#ignore_elements_by_user: some-user-identifier
+
+#######################################################################################################################
+#
+# Configure analyzer
+# The analyzer is what is responsible for traversing VCS, collecting all metrics and publishing to configured database
+# backend. 
+#
+#######################################################################################################################
+[Analyze]
+threads: 2
+# engine_url defines the sqlalchemy engine string to be used when populating databases
+# Have a look at http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#database-urls for examples
+# defaults to "sqlite:///DbAPI/databases/metrics.db"
+engine_url: sqlite:///DbAPI/databases/metrics.db
+
+# Defines the engine URL to be used for mirroring, if configured AND when calling analyze.py --mirror
+# this will cause analyze.py to mirror from engine_url -> mirror_engine_url
+# mirror_engine_url: sqlite:///DbAPI/databases/metrics.db
+
+# Path and arguments to a custom Bug Tracking System scraper
+# see docs/analyze.md for a more thorough explanation on the response contract
+custom_bts_scraper: some_path arg1 arg2
+
+# Path and arguments to code transformer
+# Some files may need to be transformed into actual src code to be analyzable. Here you can configure any such
+# caller so that it will transform file_x into a known language (for instance c++).
+# Caller will be called with the filename to transform as the last argument.
+# See docs/analyze.md for more details on this contract
+#code_transformer: filesuffix1: some_path arg1 arg2
+#                  filesuffix2: some_other_path arg1
+
+lookup_email: false
+
+# log_level: <DEBUG, INFO, WARNING, ERROR, CRITICAL>
+log_level:   INFO
+log_path:   ./analyze.log
+log_format: %%(asctime)s <%%(levelname)s>: %%(message)s
+
+# include/exclude pattern options define any paths that should be searched through looking for files to analyze
+# If adding new exclude patterns, these will also be used to remove any entries from any already existing DB
+include_patterns: src/
+                  docs/
+
+exclude_patterns: src/bin
+
+
+
+#######################################################################################################################
+#
+# Configure Version Control (VCS) Backend. 
+# There can only be a single VCS backend per config, currently only Git or ClearCase are supported.
+# Remove # from either section to enable one or the other.
+#
+#######################################################################################################################
+[Git]
+path_to_git: git
+repo_root: path_to_any_repo_to_be_analyzed
+
+# [ClearCase]
+# path_to_cleartool: cleartool
+
+[MetricsViewer]
+# engine_url defines the sqlalchemy engine string to be used when populating databases
+# Have a look at http://docs.sqlalchemy.org/en/rel_1_0/core/engines.html#database-urls for examples
+# defaults to "sqlite:///DbAPI/databases/metrics.db"
+engine_url: sqlite:///DbAPI/databases/metrics.db
+
+[ClearQuest]
+ro_user:   ro_username
+ro_pass:   ro_password
+rw_user:   rw_username
+rw_pass:   rw_password

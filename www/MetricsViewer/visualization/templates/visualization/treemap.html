@@ -1,0 +1,117 @@
+{% extends "visualization/base.html" %}
+
+{% comment "BSD notice" %}
+
+Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions
+and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
+{% endcomment %}
+
+{% load static %}
+{% block specific_static_files %}
+<script src="{% static 'visualization/lib/d3/d3-v3.5.3.min.js' %}"></script>
+<script src="{% static 'visualization/lib/d3plus/js/d3plus-v1.6.9.min.js' %}"></script>
+<script src="{% static 'visualization/lib/mustache/mustache.min.js' %}"></script>
+
+<link type="text/css" rel="stylesheet" href="{% static 'visualization/bin/css/treemap.css' %}">
+<!--[if lte IE 9]>
+<link type="text/css" href="{% static 'visualization/bin/css/treemap/treemap_IE9.css'%}" rel="stylesheet">
+<![endif]-->
+{% endblock specific_static_files %}
+{% block title %}
+<title>Treemap</title>
+{% endblock title %}
+{% block content %}
+<!-- Loaders that block during async calls -->
+<div id="loader">
+    <div id="outer_loader_box">
+        <div id="inner_loader_box"></div>
+    </div>
+</div>
+<div id="treemap_content">
+    <div id="breadcrumb-container">
+        <!--Generated breadcrumb goes here-->
+    </div>
+    <div class="select-boxes">
+        <!--Generated select boxes go here-->
+    </div>
+    <!-- Treemap container -->
+    <div id="treemap_container">
+        <!-- Hidden elements used in treemap.js -->
+        <ul id="contextMenu" class="dropdown-menu">
+            <li class="up-one-level"><a tabindex="-1" href="#">Up one level</a></li>
+            <li class="view-chart"><a tabindex="-1" href="#">View chart</a></li>
+            <li class="copy-path"><a tabindex="-1" href="#">Copy path</a></li>
+            <li class="remove"><a tabindex="-1" href="#">Remove component</a></li>
+            <li class="reset"><a tabindex="-1" href="#">Reset components</a></li>
+        </ul>
+        <div id="treemap"></div>
+    </div>
+    <form id="line_view_form" method="GET" action="{% url 'visualization:lineview' %}">
+        <input id="line_view_form_component_type" type="hidden" name="component_type">
+        <input id="line_view_form_component_id" type="hidden" name="component_id">
+        <input id="line_view_form_parent_id" type="hidden" name="parent_id">
+    </form>
+</div>
+
+{% verbatim %}
+
+<script id="template_select_size" type="text/template">
+    <select class="color-by form-control">
+        {{ #desc_list}}
+        <option value="{{ name }}">Size: {{ name }}</option>
+        {{ /desc_list}}
+    </select>
+</script>
+
+<script id="template_select_color" type="text/template">
+    <select class="color-by form-control">
+        {{ #desc_list}}
+        <option value="{{ name }}">Color: {{ name }}</option>
+        {{ /desc_list}}
+    </select>
+</script>
+
+
+<script id="breadcrumb_template" type="text/template">
+    <ol class="level-navigation breadcrumb">
+        <li class="root"><a href="#">Root</a></li>
+
+        {{ #subsystem }}
+        <li class="subsystem"><a href="#">{{ subsystem.name }}</a></li>
+        {{ /subsystem }}
+
+        {{ #file }}
+        <li class="file"><a href="#">{{ name }}</a></li>
+        {{ /file }}
+    </ol>
+</script>
+{% endverbatim %}
+
+<script src="{% static 'visualization/bin/js/treemap.bin.js' %}"></script>
+{% endblock content %}
+{% block js %}
+<script>
+    $(function () {
+        new TreemapPackage.TreemapApp()
+    });
+</script>
+{% endblock js %}

@@ -1,0 +1,77 @@
+'''
+Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions
+and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+**************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
+
+Short description:
+  Local Django settings for MetricsViewer project.
+
+  Any config options declared in here will override any options
+  in the global settings file.
+
+  This file is in .gitignore so any changes here are certain to be private.
+
+  Furthermore, its likely a good idea to set the access rights on this file
+  to only be viewable by the user running the django server.
+'''
+
+from settings import INSTALLED_APPS, MIDDLEWARE_CLASSES
+
+# The secret key must be secret! So make sure to regenerate one for your deployment!
+SECRET_KEY = 'rf(zo6d)fg*_uxpaudzc(mu6e8k)s*9m8%^*hvv^hk+dni^1ui'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+TEMPLATE_DEBUG = True
+
+ALLOWED_HOSTS = ['*']
+
+##############################################################################################
+# static files
+#
+# Add the staticfiles app if you are running a development server
+# otherwise the static files are typically served by a production server
+##############################################################################################
+
+INSTALLED_APPS += (
+    'django.contrib.staticfiles',
+)
+STATIC_URL = '/static/'
+
+
+##############################################################################################
+# Graphite & statsD
+#
+# Graphite & statsd is a statistics collection suite. Only enable this in production
+# and assuming you have installed django_statsd as well has having a running
+# statsd server..
+#
+# We have our own graphite_middleware that avoids authentication exception and adds some 
+# additional visitor & user-agent counting
+# Depends on statsd
+##############################################################################################
+#MIDDLEWARE_CLASSES = (
+#    'django_statsd.middleware.GraphiteRequestTimingMiddleware',
+#    'visualization.graphite_middleware.GraphiteMiddleware'
+#) + MIDDLEWARE_CLASSES
+
+#STATSD_CLIENT = 'django_statsd.clients.normal'
