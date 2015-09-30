@@ -43,14 +43,14 @@ class PyDiffer(object):
     '''
     Diffs 2 files, using fitting indexer and reports on their diff stats
     '''
-    def __init__(self, file1, file2, symbolic_filename_translator=lambda file_: file_, config=ProjectConfig()):
+    def __init__(self, file1, file2, symbolic_filename_translator=lambda file_: file_, config='test'):
         self._file1 = file1
         self._file2 = file2
         self._transformer_dictionary = {}
-        if config is not None:
-            self._transformer_dictionary = config.getdict('Analyze', 'code_transformer', {})
+        if isinstance(config, ProjectConfig):
+            self._transformer_dictionary = config.getdict('Analyze', 'code_transformer', {})  # pylint: disable=E1101
+
         self._symbolic_filename_translator = symbolic_filename_translator
-        config = ProjectConfig()
 
     def _get_indexer(self, file_):
         content = []

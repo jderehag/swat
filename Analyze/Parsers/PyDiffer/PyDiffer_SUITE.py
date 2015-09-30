@@ -51,7 +51,7 @@ class testPyDiffer(unittest.TestCase):
                    "func1": (1, 0, 0, 1),
                    "Class3::func2": (2, 0, 0, 4)}
 
-        stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_1, config=None).get_changestat()
+        stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_1).get_changestat()
         self.assertDictEqual(testbed, stats)
 
     def test_CPP_changed(self):
@@ -60,12 +60,12 @@ class testPyDiffer(unittest.TestCase):
                    "func2": (0, 1, 0, 14),
                    "func6": (0, 1, 6, 8),
                    "main": (0, 1, 0, 14)}
-        stats = PyDiffer(cpp_testfile2_0, cpp_testfile2_1, config=None).get_changestat()
+        stats = PyDiffer(cpp_testfile2_0, cpp_testfile2_1).get_changestat()
         self.assertDictEqual(testbed, stats)
 
     def test_samefile(self):
         testbed = {}
-        stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_0, config=None).get_changestat()
+        stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_0).get_changestat()
         self.assertDictEqual(testbed, stats)
 
     def runTest(self):
