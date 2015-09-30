@@ -55,6 +55,7 @@ class ClearCase(VcsWrapperContract):
         """
         kwargs = kwargs
         super(ClearCase, self).__init__()
+        self._config = config
         self._path_to_clearcase = config.get('ClearCase', 'path_to_cleartool', cleartool)
 
         '''
@@ -320,7 +321,8 @@ class ClearCase(VcsWrapperContract):
 
         diffs = PyDiffer.PyDiffer(element1,
                                   element2,
-                                  symbolic_filename_translator=self.symbolic_filename_translator).get_changestat()
+                                  symbolic_filename_translator=self.symbolic_filename_translator,
+                                  config=self._config).get_changestat()
         diffEntry['functions'] = list(diffs.iterkeys())
 
         return diffEntry

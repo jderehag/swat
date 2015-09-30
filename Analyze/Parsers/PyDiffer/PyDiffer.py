@@ -39,17 +39,18 @@ from Utils.ProjectConfig import ProjectConfig, default_config
 
 from Analyze.Metrics.LizardWrapper import LizardIndexer
 
-config = ProjectConfig()
-
 class PyDiffer(object):
     '''
     Diffs 2 files, using fitting indexer and reports on their diff stats
     '''
-    def __init__(self, file1, file2, symbolic_filename_translator=lambda file_: file_):
+    def __init__(self, file1, file2, symbolic_filename_translator=lambda file_: file_, config=ProjectConfig()):
         self._file1 = file1
         self._file2 = file2
-        self._transformer_dictionary = config.getdict('Analyze', 'code_transformer', ())
+        self._transformer_dictionary = {}
+        if config is not None:
+            self._transformer_dictionary = config.getdict('Analyze', 'code_transformer', {})
         self._symbolic_filename_translator = symbolic_filename_translator
+        config = ProjectConfig()
 
     def _get_indexer(self, file_):
         content = []
@@ -259,7 +260,7 @@ def _main():
 
     logger.setup_stdout_logger(args.verbose)
 
-    stats = PyDiffer(args.files[0], args.files[1],).get_changestat()
+    stats = PyDiffer(args.files[0], args.files[1], config=ProjectConfig(args.config)).get_changestat()
 
     if args.pretty:
         # Find longest function name
