@@ -63,7 +63,7 @@ class MetricsDb(object):
     Handles creation of db, common queries and so on..
     '''
     def __init__(self, enginestr):
-        self.engine = create_engine(enginestr)
+        self.engine = create_engine(enginestr, pool_recycle=3600)
 
         self.metadata = Base.metadata  # pylint: disable=W0201
         self.metadata.bind = self.engine
