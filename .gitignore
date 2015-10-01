@@ -4,14 +4,13 @@
 *.pyc
 *.log
 .gitconfig
+project.config
 
 ###################
 # Database stuff
 ###################
-*.db
-DbAPI/databases
 *.pickle
-project.config
+*.db
 
 ###################
 # IDE/Editor files
@@ -21,3 +20,27 @@ project.config
 tags
 .project
 .pydevproject
+
+###################
+# www-backend
+###################
+www/MetricsViewer/MetricsViewer/local_settings.py
+
+###################
+# www-frontend
+###################
+# TernJS related
+www/MetricsViewer/visualization/.tern-port
+
+# Node produced output
+www/MetricsViewer/visualization/static/visualization/node_modules/
+www/MetricsViewer/visualization/static/visualization/npm-debug.log
+
+# JsDoc output
+www/MetricsViewer/visualization/static/visualization/js/out/
+
+# Intermediate files
+www/MetricsViewer/visualization/*.sass-cache
+www/MetricsViewer/visualization/*.css.map
+www/MetricsViewer/visualization/.zedstate
+
