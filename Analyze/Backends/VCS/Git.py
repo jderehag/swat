@@ -93,7 +93,14 @@ class Git(VcsWrapperContract):
     def _git(self, args, with_errno=False):
         if isinstance(args, str):
             args = args.split(' ')
-        return sysutils.call_subprocess([self._path_to_git] + args, with_errno=with_errno, cwd=self._repo).strip()
+        output = sysutils.call_subprocess([self._path_to_git] + args, with_errno=with_errno, cwd=self._repo)
+
+        if with_errno:
+            output = output[0], output[1].strip()
+        else:
+            output = output.strip()
+
+        return output
 
     def find_contributors(self, file_, since_date=None):
         """
