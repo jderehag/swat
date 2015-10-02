@@ -122,8 +122,3 @@ repo_root: path_to_any_repo_to_be_analyzed
 # defaults to "sqlite:///DbAPI/databases/metrics.db"
 engine_url: sqlite:///DbAPI/databases/metrics.db
 
-[ClearQuest]
-ro_user:   ro_username
-ro_pass:   ro_password
-rw_user:   rw_username
-rw_pass:   rw_password
