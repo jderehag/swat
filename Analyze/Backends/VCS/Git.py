@@ -439,7 +439,7 @@ class Git(VcsWrapperContract):
             match = regx.search(inputstr)
             if match is not None:
                 if regx.groups <= 0:
-                    return random_defect_id
+                    return hash(random_defect_id)
                 else:
                     defect_ids = [id_.lstrip('0') for id_ in match.groups() if id_ is not None]
                     if len(defect_ids) > 0:
