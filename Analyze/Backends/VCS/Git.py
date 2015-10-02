@@ -58,7 +58,7 @@ class Git(VcsWrapperContract):
         self._repo = config.get('Git', 'repo_root')
         self._current_branch = self._git('rev-parse --abbrev-ref HEAD')
 
-        self._ignore_users = config.getlist('General', 'ignore_elements_by_user')
+        self._ignore_users = config.getlist('General', 'ignore_elements_by_user', ())
 
         '''
         Defect regex config evaluation
