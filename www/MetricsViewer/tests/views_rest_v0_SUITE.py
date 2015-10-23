@@ -129,7 +129,8 @@ class TestViewsRestV0(django.test.SimpleTestCase):
         response = self.client.get('/api/v0/subsystems/1/function_change_metrics.json')
         self.assertEqual(response.status_code, 200)
 
-        testbench = [["file1", "function1", 2000, None],
+        testbench = [["file", "function", "nloc", "cyclomatic_complexity"],
+                     ["file1", "function1", 2000, None],
                      ["file1", "function2", 4000, None],
                      ["file2", "function3", 7000, None]]
 
