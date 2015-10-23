@@ -63,6 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <ul class="nav nav-tabs ">
                     <li id="treemap_link" class="last"><a href="{% url 'visualization:treemapview' %}">Treemap</a></li>
                     <li id="line_view_link" class="last"><a href="{% url 'visualization:lineview' %}">Charts</a></li>
+                    <li id="subsystem_csv_dumper_link" class="last"><a href="{% url 'visualization:subsystem_csv_dumper' %}">CSVs</a></li>
                     <li id="docs_link" class="last"><a href="/docs/frontends/django_usability.md">/docs</a></li>
                 </ul>
             </div>
@@ -87,6 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             index_url: "{% url 'visualization:index' %}",
             treemap_url: "{% url 'visualization:treemapview' %}",
             line_view_url: "{% url 'visualization:lineview' %}",
+            subsystem_csv_dumper_url: "{% url 'visualization:subsystem_csv_dumper' %}",
             docs_url: "{% url 'visualization:docsroot' %}"
         };
         base.set_active_navbar_link(urls, current_url);

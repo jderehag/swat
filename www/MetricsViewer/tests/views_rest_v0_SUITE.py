@@ -125,6 +125,16 @@ class TestViewsRestV0(django.test.SimpleTestCase):
 
         self.assertJSONEqual(response.content, testbench)
 
+    def test_subsystem_id_function_change_metrics(self):
+        response = self.client.get('/api/v0/subsystems/1/function_change_metrics.json')
+        self.assertEqual(response.status_code, 200)
+
+        testbench = [["file1", "function1", 2000, None],
+                     ["file1", "function2", 4000, None],
+                     ["file2", "function3", 7000, None]]
+
+        self.assertJSONEqual(response.content, testbench)
+
 
     def test_subsystem_id_defects_range(self):
         response = self.client.get('/api/v0/subsystems/1/defects.json')

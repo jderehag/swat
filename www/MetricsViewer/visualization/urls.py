@@ -41,6 +41,7 @@ urlpatterns = patterns(
     url(r'^treemap/$', views.treemap_view, name='treemapview'),
     url(r'^lineview/$', views.line_view, name='lineview'),
     url(r'^experimental/$', views.experimental_view, name='experimental'),
+    url(r'^subsystem_csv_dumper/$', views.subsystem_csv_dumper, name='subsystem_csv_dumper'),
     url(r'^risk_assessment/$', views.risk_assessment_view, name='risk_assessment'),
     url(r'^contributors_defects/$', views.contributors_defects_view, name='contributors_defects'),
 

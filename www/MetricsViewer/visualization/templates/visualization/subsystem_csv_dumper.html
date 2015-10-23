@@ -1,5 +1,7 @@
-/*
-Copyright (C) 2015 - Dani Hodovic <dani.hodovic@ericsson.com> for Ericsson AB
+{% extends "visualization/base.html" %}
+{% comment "BSD notice" %}
+
+Copyright (c) 2015, Jesper Derehag <jesper.derehag@ericsson.com> for Ericsson AB
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -20,21 +22,27 @@ WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWIS
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **************************    THIS LINE IS 120 CHARACTERS WIDE - DO *NOT* EXCEED 120 CHARACTERS!    *******************
-* Short description:
-* Script to determine which link is active
-*/
+{% endcomment %}
+
+{% load staticfiles %}
 
 
-var base = {
-    set_active_navbar_link: function(urls, current_url) {
-        if (urls.index_url === current_url || urls.treemap_url === current_url) {
-            $("#treemap_link").attr("class", "active");
-        } else if (urls.line_view_url === current_url) {
-            $("#line_view_link").attr("class", "active");
-        } else if (urls.subsystem_csv_dumper_url === current_url) {
-            $("#subsystem_csv_dumper_link").attr("class", "active");
-        } else if (current_url.search(urls.docs_url) >= 0) {
-            $("#docs_link").attr("class", "active");
-        }
-    }
-};
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=utf-8/>
+    
+</head>
+<body>
+    <div style="text-align:center">
+        <h1>Subsystem CSV dumps</h2>
+        <p>Click any subsystem below to download a CSV dump for file & functions.</br> 
+        Do not bother bookmarking the direct link to the subsystem since these are dynamic and may change.</p>
+    {% for name, id in subsystems %}
+        <a href="/api/v0/subsystems/{{ id }}/function_change_metrics.csv">{{ name }}</a></br>
+    {% endfor %}
+    </div> 
+</body>
+</html>
+{% endblock content %}

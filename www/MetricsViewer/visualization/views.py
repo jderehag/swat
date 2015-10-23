@@ -55,6 +55,12 @@ def experimental_view(request):  # pylint: disable=C0111
     return render(request, "visualization/experimental.html")
 
 @require_GET
+@views_utils.session_decorator
+def subsystem_csv_dumper(session, request):  # pylint: disable=C0111
+    subsystems = session.query(Subsystem.subsystem, Subsystem.id).order_by(Subsystem.subsystem).all()
+    return render(request, "visualization/subsystem_csv_dumper.html", {'subsystems': subsystems})
+
+@require_GET
 def risk_assessment_view(request):  # pylint: disable=C0111
     return render(request, "visualization/risk_assessment.html")
 

@@ -34,6 +34,7 @@ module Requests {
     treemap_data: '/treemap_data/',
     lineview: '/lineview/',
     lineview_data: '/lineview_data/',
+    subsystem_csv_dumper: '/subsystem_csv_dumper/',
     metric_descriptions: '/metric_descriptions/',
     docs: '/docs/'
   }

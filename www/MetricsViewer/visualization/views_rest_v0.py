@@ -185,6 +185,38 @@ def subsystem_id_change_metrics(session, request, subsystem_id, formating='json'
 
 @require_GET
 @views_utils.session_decorator
+def subsystem_id_function_change_metrics(session, _, subsystem_id, formating='json'):
+    '''
+    Returns an array of change_metrics (for each function) within a specific subsystem
+
+    See docs/frontends/django_implementation.md for a more detailed description of the format
+
+    Args:
+        session(sqlalchemy session): session to use for queries
+        request:                   : django request object
+        subsystem_id(int):         : The subsystem_id to be requested
+        formating(str):    Indicates wich format that should be returned, [json|csv]
+    '''
+    filename, = session.query(Subsystem.subsystem).filter(Subsystem.id == int(subsystem_id)).one()
+
+    query = session.query(File.file,
+                          Function.function,
+                          ChangeMetric.nloc,
+                          ChangeMetric.cyclomatic_complexity)
+
+    query = query.filter(ChangeMetric.function_id == Function.id,
+                         File.id == ChangeMetric.file_id,
+                         File.subsystem_id == int(subsystem_id),
+                         ChangeMetric.nloc > 0)\
+                         .group_by(ChangeMetric.function_id)\
+                         .having(func.max(ChangeMetric.date))\
+                         .order_by(File.file, Function.function)
+
+    data_ = [('file', 'function', 'nloc', 'cyclomatic_complexity')] + query.all()
+    return views_utils.dump_data(data_, response_type=formating, filename=filename)
+
+@require_GET
+@views_utils.session_decorator
 def subsystem_id_defects(session, request, subsystem_id, formating='json'):
     '''
     Returns an array of defects for a specific subsystem
