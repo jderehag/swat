@@ -45,11 +45,11 @@ class testPyDiffer(unittest.TestCase):
         # function: (added, changed, deleted, total)
         # These are incorrect due to that lizard does not handle namespaces.
         # Also, it would seem that it incorrectly identifies func1 as not belonging to Class3.
-        testbed = {"": (13, 0, 4, 56),
-                   "Class1::func2": (0, 0, 4, 0),
-                   "Class2::func2": (2, 0, 0, 4),
-                   "func1": (1, 0, 0, 1),
-                   "Class3::func2": (2, 0, 0, 4)}
+        testbed = {'': (13, 0, 4, 57),
+                   'Class1::func2': (0, 0, 4, 0),
+                   'Class2::func2': (2, 0, 0, 4),
+                   'func1': (1, 0, 0, 1),
+                   'Class3::func2': (2, 0, 0, 4)}
 
         stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_1).get_changestat()
         self.assertDictEqual(testbed, stats)
@@ -68,10 +68,30 @@ class testPyDiffer(unittest.TestCase):
         stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_0).get_changestat()
         self.assertDictEqual(testbed, stats)
 
-    def runTest(self):
-        self.test_CPP_added_deleted()
-        self.test_CPP_changed()
-        self.test_samefile()
+    def test_empty_file(self):
+        stats = PyDiffer(cpp_testfile2_0, os.devnull).get_changestat()
+        testbed = {'': (0, 0, 29, 0),
+                   'func2': (0, 0, 14, 0),
+                   'func3': (0, 0, 14, 0),
+                   'func4': (0, 0, 14, 0),
+                   'func5': (0, 0, 14, 0),
+                   'func6': (0, 0, 14, 0),
+                   'main': (0, 0, 14, 0)}
+        self.assertDictEqual(testbed, stats)
+
+        # Once again here we can see that lizard cannot identify if a function is declared in the class definition
+        # (or it may be due to that its a oneliner, in either case it hangs up func1 as not belonging to any class
+        # or namespace (and since we have 2 functions named func1, they get aggregated.
+        stats = PyDiffer(os.devnull, cpp_testfile2_0).get_changestat()
+        testbed = {'': (29, 0, 0, 29),
+                   'main': (14, 0, 0, 14),
+                   'func2': (14, 0, 0, 14),
+                   'func3': (14, 0, 0, 14),
+                   'func4': (14, 0, 0, 14),
+                   'func5': (14, 0, 0, 14),
+                   'func6': (14, 0, 0, 14)}
+
+        self.assertDictEqual(testbed, stats)
 
 if __name__ == "__main__":
     unittest.main()

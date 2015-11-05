@@ -43,8 +43,7 @@ class testLizardWrapper(unittest.TestCase):
         """
         Checks so that the function names in the dictionary the tool outputs are correct.
         """
-        correct_function_names = ['',
-                                  'firstFunction',
+        correct_function_names = ['firstFunction',
                                   'emptyFunc',
                                   'main',
                                   'bMethodXyz123bb123',
@@ -59,8 +58,7 @@ class testLizardWrapper(unittest.TestCase):
         """
         Tests number of SLOC source-line-of-code
         """
-        correct_NLOC = {'': 5,
-                        'methodWithUnnamedReturnStruct': 14,
+        correct_NLOC = {'methodWithUnnamedReturnStruct': 14,
                         'firstFunction': 26,
                         'bMethodXyz123bb123': 76,
                         'emptyFunc': 2,
@@ -76,8 +74,7 @@ class testLizardWrapper(unittest.TestCase):
         Counts the cyclomatic complexity (McCabe) for each function and asserts it
         against the correct value for the target file.
         """
-        correct_cyclo = {'': 0,
-                         'methodWithUnnamedReturnStruct': 5,
+        correct_cyclo = {'methodWithUnnamedReturnStruct': 5,
                          'firstFunction': 11,
                          'bMethodXyz123bb123': 41,
                          'emptyFunc': 1,

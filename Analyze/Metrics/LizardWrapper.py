@@ -115,21 +115,8 @@ def run_lizard(filename, filecontent=None):
     lizard_object = _SymbolicFileAnalyzer(extensions=lizard.get_extensions([])).analyze_file(filename, filecontent)
 
     if lizard_object:
-        function_list = [func.__dict__ for func in lizard_object.function_list]
-
-        global_scope = {'name': '',
-                        'nloc': lizard_object.nloc - sum([func.nloc for func in lizard_object.function_list]),
-                        'cyclomatic_complexity': 0,
-                        'token_count': 0,
-                        'parameter_count': 0,
-                        'start_line': 0,
-                        'end_line': 0}
-
-        function_list.insert(0, global_scope)
-
         logger.debug("Parsed file %s ", os.path.basename(filename))
-
-        return function_list
+        return [func.__dict__ for func in lizard_object.function_list]
 
     else:
         logger.debug("Unable to parse file %s", os.path.basename(filename))
