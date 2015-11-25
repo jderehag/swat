@@ -153,24 +153,28 @@ class Maintainers(object):
             do_exclude = False
             # First check exclude pattern
             for exclpattern in maintainer['file-exclude-pattern']:
-
                 if exclpattern[-1:] == '/':  # Handle this like a catch-all recursive directory rule
                     if filename.startswith(exclpattern):
                         do_exclude = True
+                        logger.debug('Excluding "%s" based on, rule=%s', maintainer['subsystem'], exclpattern)
                 else:
                     if fnmatch(filename, exclpattern):
                         do_exclude = True
+                        logger.debug('Excluding "%s" based on, rule=%s', maintainer['subsystem'], exclpattern)
 
             # Then check include pattern
             if do_exclude is False:
                 for inclpattern in maintainer['file-include-pattern']:
                     if filename[1] == '/':  # Handle this as an absolute path
                         if filename.endswith(inclpattern):
+                            logger.debug('Found match for "%s", rule=%s', maintainer['subsystem'], inclpattern)
                             matching_maintainers.append(maintainer)
                     elif inclpattern[-1:] == '/':  # Handle this like a catch-all recursive directory rule
                         if inclpattern in filename:
+                            logger.debug('Found match for "%s", rule=%s', maintainer['subsystem'], inclpattern)
                             matching_maintainers.append(maintainer)
                     elif fnmatch(filename, inclpattern):
+                        logger.debug('Found match for "%s", rule=%s', maintainer['subsystem'], inclpattern)
                         matching_maintainers.append(maintainer)
         return matching_maintainers
 
