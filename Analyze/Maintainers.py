@@ -38,7 +38,7 @@ class Maintainers(object):
     """
 
     def __init__(self, maintainerfile):
-        self._maintainerfile = maintainerfile
+        self._maintainerfile = os.path.expandvars(maintainerfile)
         self._maintainer_entrys = []
         self._env_parser = EnvParser.EnvPathParser()
 
