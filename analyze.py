@@ -317,7 +317,7 @@ def _get_complexity(curr_version_file, transformer):
     if lizard_data is not None:
         return_complexity = {func['name']: (func['cyclomatic_complexity'],
                                             func['token_count'],
-                                            func['parameter_count']) for func in lizard_data}
+                                            len(func['parameters'])) for func in lizard_data}
     return return_complexity
 
 

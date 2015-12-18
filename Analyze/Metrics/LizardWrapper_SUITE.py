@@ -49,7 +49,7 @@ class testLizardWrapper(unittest.TestCase):
                                   'bMethodXyz123bb123',
                                   'aMethod123',
                                   'shortFunction',
-                                  'methodWithUnnamedReturnStruct']
+                                  'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if']
 
         function_list = run_lizard(target_test_file)
         self.assertListEqual(correct_function_names, [func['name'] for func in function_list])
@@ -58,7 +58,7 @@ class testLizardWrapper(unittest.TestCase):
         """
         Tests number of SLOC source-line-of-code
         """
-        correct_NLOC = {'methodWithUnnamedReturnStruct': 14,
+        correct_NLOC = {'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if': 10,
                         'firstFunction': 26,
                         'bMethodXyz123bb123': 76,
                         'emptyFunc': 2,
@@ -74,7 +74,7 @@ class testLizardWrapper(unittest.TestCase):
         Counts the cyclomatic complexity (McCabe) for each function and asserts it
         against the correct value for the target file.
         """
-        correct_cyclo = {'methodWithUnnamedReturnStruct': 5,
+        correct_cyclo = {'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if': 5,
                          'firstFunction': 11,
                          'bMethodXyz123bb123': 41,
                          'emptyFunc': 1,

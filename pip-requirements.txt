@@ -37,7 +37,7 @@ sqlalchemy>=0.9.8
 progress==1.2
 
 #Analysis tools
-lizard==1.8.11
+lizard==1.9.2
 
 # Django requirements for standalone (local) server
 Django>=1.6.5
