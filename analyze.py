@@ -380,7 +380,7 @@ def _lookup_emails(db):
     logger.info("Transform usernames to email addresses...")
     non_email_users = 0
     transformed_users = 0
-    removed_users = 0
+    removed_users = []
     ldap = LdapWrapper.LdapWrapper()
     with db.get_session() as session:
         for user in session.query(User).filter(User.user.notlike('%@%')):
@@ -395,14 +395,16 @@ def _lookup_emails(db):
                         defect.user = existing_user
                     for cm in user.change_metrics:
                         cm.user = existing_user
-                    session.delete(user)
-                    removed_users += 1
+                    removed_users.append(user.id)
                 else:
                     transformed_users += 1
                     user.user = email
         session.commit()
+        session.expire_all()
+        for id_ in removed_users:
+            session.delete(session.query(User).filter(User.id == id_).one())
     logger.info("Found %d non email-users, transformed %d, removed %d", non_email_users,
-                transformed_users, removed_users)
+                transformed_users, len(removed_users))
 
 
 def _translate_username(entry):
