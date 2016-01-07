@@ -430,9 +430,9 @@ class worker(object):
         try:
             return self.func(*args, **kwargs)
         except Exception as e:  # pylint: disable=W0703
-            print traceback.format_exc()
-            print "Cought exception in worker %s", e
-            print "Args:", args
+            logger.critical(traceback.format_exc())
+            logger.critical("Cought exception in worker %s", e)
+            logger.critical("Args: %s", args)
             exit(-1)
 
 class _PathAction(argparse.Action):
