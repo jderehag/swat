@@ -173,7 +173,7 @@ class Git(VcsWrapperContract):
                     if pydiffer.endswith('c'):
                         pydiffer = pydiffer[:-1]
 
-                    args = ['difftool', '-M',
+                    args = ['difftool', '-M', '--no-prompt',
                             '--extcmd="' + os.path.realpath(pydiffer) + '"']
                     args += [version + "^!", "--", filealias]
                     output = self._git(args)
