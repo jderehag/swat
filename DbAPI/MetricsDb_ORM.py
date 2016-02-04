@@ -36,6 +36,8 @@ import time
 from collections import OrderedDict
 from sqlalchemy.dialects.mysql.base import DECIMAL
 
+_VARBINARY_MAX = 700
+
 '''
 #######################################################################################################################
 # Specialized types
@@ -141,7 +143,7 @@ class Subsystem(Base):
     '''
     __tablename__ = 'subsystem'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    subsystem = Column(VARBINARY(255), unique=True)
+    subsystem = Column(VARBINARY(_VARBINARY_MAX), unique=True)
     status = Column(String(255))
     maintainer = Column(String(255))
 
@@ -155,7 +157,7 @@ class File(Base):
     __tablename__ = 'file'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     subsystem_id = Column(Integer, ForeignKey('subsystem.id'), nullable=True)
-    file = Column(VARBINARY(255), unique=True)
+    file = Column(VARBINARY(_VARBINARY_MAX), unique=True)
 
     functions = relationship("Function", backref=backref('file'), cascade_backrefs=True,
                              cascade='all, delete-orphan', single_parent=True)
@@ -172,7 +174,7 @@ class Function(Base):
     __tablename__ = 'function'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
     file_id = Column(Integer, ForeignKey('file.id'), nullable=False)
-    function = Column(VARBINARY(255))
+    function = Column(VARBINARY(_VARBINARY_MAX))
     __table_args__ = (UniqueConstraint('file_id', 'function'),)
 
     defect_mods = relationship("DefectModification", backref=backref('function'), cascade_backrefs=True,
@@ -188,7 +190,7 @@ class Version(Base):
     '''
     __tablename__ = 'version'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    version = Column(VARBINARY(255), unique=True)
+    version = Column(VARBINARY(_VARBINARY_MAX), unique=True)
 
     defect_mods = relationship("DefectModification", backref=backref('version'), cascade_backrefs=True,
                                cascade='all, delete-orphan', single_parent=True)
@@ -202,7 +204,7 @@ class User(Base):
     '''
     __tablename__ = 'user'
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
-    user = Column(VARBINARY(255), unique=True)
+    user = Column(VARBINARY(_VARBINARY_MAX), unique=True)
 
     defect_mods = relationship("DefectModification", backref=backref('user'))
     change_metrics = relationship("ChangeMetric", backref=backref('user'))
@@ -269,7 +271,7 @@ class Eav(Base):
     Very low-performance and typically storing things like when the database was last updated.
     '''
     __tablename__ = 'eav_store'
-    key = Column(VARBINARY(255), primary_key=True, unique=True)
+    key = Column(VARBINARY(_VARBINARY_MAX), primary_key=True, unique=True)
     value_ = Column(String(255))
     type = Column(String(255))
 
