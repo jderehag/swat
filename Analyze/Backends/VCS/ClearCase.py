@@ -119,23 +119,21 @@ class ClearCase(VcsWrapperContract):
         """
         defect_mods = {}
         if changeinfo:
-            defect_mods = self._match_branches_to_defects(self._get_history(file_, since_date),
-                                                          lambda(x): x['version'],
-                                                          lambda(x): x['activity'])
+            defect_elems = self._match_branches_to_defects(self._get_history(file_, since_date),
+                                                           lambda(x): x['version'],
+                                                           lambda(x): x['activity'])
 
             # Remove defect branches that never got delivered
-            defect_mods = {k: v for (k, v) in defect_mods.iteritems() for elem in v if elem['merge-to'] != ""}
+            defect_elems = {k: v for (k, v) in defect_elems.iteritems() for elem in v if elem['merge-to'] != ""}
 
-            for defect_id, entries in defect_mods.iteritems():
+            for defect_id, entries in defect_elems.iteritems():
                 '''
                 This is a really ugly setup with the getDelivered thingy, but dont have time to clean
                 it out and CC is on the decline anyway
                 '''
                 for elem, delivered_elem, rebased_elem in self._get_delivered_and_rebased_elems(file_, entries):
-                    entry = {}
-                    entry.update(elem)
-                    entry.update(self._get_changed_functions(rebased_elem, delivered_elem))
-                    defect_mods.setdefault(defect_id, []).append(entry)
+                    elem.update(self._get_changed_functions(rebased_elem, delivered_elem))
+                    defect_mods.setdefault(defect_id, []).append(elem)
         else:
             '''
             This unfortunatly also includes branches that may not have been delivered, but is faster
@@ -308,12 +306,10 @@ class ClearCase(VcsWrapperContract):
             element1(str): the full path to the element version (gsc.c@@/main/1)
             element2(str): the full path to the element version (gsc.c@@/main/2)
         Returns:
-            dict{}:
-                dict['functions'](str) : Changed functions/function
+            list(str) : Changed functions/function
         Raises:
             None
         """
-        diffEntry = {}
         if element1 is None:
             element1 = "/dev/null"
         if element2 is None:
@@ -323,26 +319,28 @@ class ClearCase(VcsWrapperContract):
                                   element2,
                                   symbolic_filename_translator=self.symbolic_filename_translator,
                                   config=self._config).get_changestat()
-        diffEntry['functions'] = list(diffs.iterkeys())
 
-        return diffEntry
+        return list(diffs.iterkeys())
 
     def _match_branches_to_defects(self, list_of_elements, find_branch_name, random_identifier):
-        matching_branches = {}
-        for branch_entry in list_of_elements:
-            match = self._defect_regexp_all_c.search(find_branch_name(branch_entry))
+        def __get_defect(element):
+            match = self._defect_regexp_all_c.search(find_branch_name(element))
             if match is not None:
                 if self._defect_regexp_all_c.groups <= 0:
-                    matching_branches.setdefault(random_identifier(branch_entry),
-                                                 []).append(find_branch_name(branch_entry))
+                    return random_identifier(element)
                 else:
                     defect_ids = [id_.lstrip('0') for id_ in match.groups() if id_ is not None]
                     if len(defect_ids) > 0:
                         # Make sure that all captured groups are identical
                         assert defect_ids.count(defect_ids[0]) == len(defect_ids)
-                        matching_branches.setdefault(defect_ids[0], []).append(find_branch_name(branch_entry))
+                        return find_branch_name(element)
 
-        return matching_branches
+        defects = {}
+        for elem in list_of_elements:
+            defect_id = __get_defect(elem)
+            if defect_id is not None:
+                defects.setdefault(defect_id, []).append(elem)
+        return defects
 
     def _get_branch_names(self, file_):
         """

@@ -43,15 +43,11 @@ cpp_testfile2_1 = os.path.dirname(__file__) + "/resources/testfile_haiku.1.cpp"
 class testPyDiffer(unittest.TestCase):
     def test_CPP_added_deleted(self):
         # function: (added, changed, deleted, total)
-        # These are incorrect due to that lizard does not handle namespaces.
-        # Also, it would seem that it incorrectly identifies func1 as not belonging to Class3.
         testbed = {'': (13, 0, 4, 57),
                    'NS2::Class3::func2': (2, 0, 0, 4),
                    'NS1::Class2::func2': (2, 0, 0, 4),
                    'NS2::Class3::func1': (1, 0, 0, 1),
                    'Class1::func2': (0, 0, 4, 0)}
-
-
         stats = PyDiffer(cpp_testfile1_0, cpp_testfile1_1).get_changestat()
         self.assertDictEqual(testbed, stats)
 

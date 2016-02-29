@@ -64,30 +64,26 @@ class LizardIndexer(object):
             return False
 
     def __init__(self, file_, filecontent=None, symbolic_filename_translator=lambda file_: file_):
-        self._file = file_
-
         if filecontent is None:
-            self._lizard_data = run_lizard(symbolic_filename_translator(self._file))
-            with open(self._file) as f:
-                self._total_lines = len(f.readlines())
-        else:
-            self._lizard_data = run_lizard(file_, filecontent)
-            self._total_lines = len(filecontent.splitlines())
+            with open(file_) as f:
+                filecontent = f.read()
 
+        self._lizard_data = run_lizard(file_, symbolic_filename_translator, filecontent)
+        # os.pathsep gives incorrect values for some reason
+        self._total_lines = filecontent.count('\n')
         self._function_lines = sum([func['end_line'] - func['start_line'] + 1 for func in self._lizard_data])
 
-    def get_function_by_linenr(self, linenr, verbose=False):
+    def get_function_by_linenr(self, linenr):
         '''
         This function should output number-of-lines-of-code and not sloc, so we need to translate
         '''
-        verbose = verbose
         for func in self._lizard_data:
             if linenr >= func['start_line'] and linenr <= func['end_line']:
                 return func['name'], func['end_line'] - func['start_line'] + 1
 
         return '', self._total_lines - self._function_lines
 
-def run_lizard(filename, filecontent=None):
+def run_lizard(filename, symbolic_filename_translator=lambda file_: file_, filecontent=None):
     '''
     Runs lizard with the possibility of using a symbolic file translation
     Explanation of terms:
@@ -112,7 +108,12 @@ def run_lizard(filename, filecontent=None):
 
             If parsing fails an empty list will be returned
     '''
-    lizard_object = _SymbolicFileAnalyzer(extensions=lizard.get_extensions([])).analyze_file(filename, filecontent)
+    if filecontent is None:
+        with open(filename) as f:
+            filecontent = f.read()
+
+    fa = _SymbolicFileAnalyzer(extensions=lizard.get_extensions([]))
+    lizard_object = fa.analyze_file(symbolic_filename_translator(filename), filecontent)
 
     if lizard_object:
         logger.debug("Parsed file %s ", os.path.basename(filename))
