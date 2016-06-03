@@ -255,7 +255,7 @@ def _lookup_metrics(pool, walker, vcs, db, files, last_update, config_transforme
                     tokens = None
                     parameter_count = None
                 else:
-                    cyclomatic_complexity, tokens, parameter_count = complexity[function]
+                    cyclomatic_complexity, tokens, parameter_count, max_nd, fin, fout = complexity[function]
 
                 db.insert_change_metric(session,
                                         file_=translated_file,
@@ -269,7 +269,10 @@ def _lookup_metrics(pool, walker, vcs, db, files, last_update, config_transforme
                                         nloc=nloc,
                                         cyclomatic_complexity=cyclomatic_complexity,
                                         token_count=tokens,
-                                        parameter_count=parameter_count)
+                                        parameter_count=parameter_count,
+                                        max_nesting_depth=max_nd,
+                                        fan_in=fin,
+                                        fan_out=fout)
         session.commit()
 
 
@@ -317,7 +320,10 @@ def _get_complexity(curr_version_file, transformer):
     if lizard_data is not None:
         return_complexity = {func['name']: (func['cyclomatic_complexity'],
                                             func['token_count'],
-                                            len(func['parameters'])) for func in lizard_data}
+                                            len(func['parameters']),
+                                            func.get('max_nesting_depth', None),
+                                            func.get('fan_in', None),
+                                            func.get('fan_out', None)) for func in lizard_data}
     return return_complexity
 
 

@@ -49,7 +49,7 @@ class testLizardWrapper(unittest.TestCase):
                                   'bMethodXyz123bb123',
                                   'aMethod123',
                                   'shortFunction',
-                                  'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if']
+                                  'methodWithUnnamedReturnStruct']
 
         function_list = run_lizard(target_test_file)
         self.assertListEqual(correct_function_names, [func['name'] for func in function_list])
@@ -58,12 +58,12 @@ class testLizardWrapper(unittest.TestCase):
         """
         Tests number of SLOC source-line-of-code
         """
-        correct_NLOC = {'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if': 10,
-                        'firstFunction': 26,
+        correct_NLOC = {'firstFunction': 26,
                         'bMethodXyz123bb123': 76,
                         'emptyFunc': 2,
                         'aMethod123': 22,
                         'main': 40,
+                        'methodWithUnnamedReturnStruct': 14,
                         'shortFunction': 1}
 
         function_list = run_lizard(target_test_file)
@@ -74,17 +74,57 @@ class testLizardWrapper(unittest.TestCase):
         Counts the cyclomatic complexity (McCabe) for each function and asserts it
         against the correct value for the target file.
         """
-        correct_cyclo = {'name_s*methodWithUnnamedReturnStruct(structname_s*name)::if': 5,
-                         'firstFunction': 11,
+        correct_cyclo = {'firstFunction': 11,
                          'bMethodXyz123bb123': 41,
                          'emptyFunc': 1,
                          'aMethod123': 11,
                          'main': 21,
+                         'methodWithUnnamedReturnStruct': 5,
                          'shortFunction': 2}
 
         function_list = run_lizard(target_test_file)
         result_dict = {func['name']: func["cyclomatic_complexity"] for func in function_list}
         self.assertDictEqual(correct_cyclo, result_dict)
+
+    def test_nd(self):
+        """
+        Counts the nesting depth for all functions
+        """
+        correct_nd = {'firstFunction': 6,
+                      'bMethodXyz123bb123': 6,
+                      'emptyFunc': 0,
+                      'aMethod123': 6,
+                      'main': 6,
+                      'methodWithUnnamedReturnStruct': 4,
+                      'shortFunction': 1}
+
+        function_list = run_lizard(target_test_file)
+        result_dict = {func['name']: func["max_nesting_depth"] for func in function_list}
+        self.assertDictEqual(correct_nd, result_dict)
+
+    def test_fans(self):
+        """
+        Counts fan-in & fan-out
+        """
+        correct_fin = {'firstFunction': 0,
+                       'bMethodXyz123bb123': 0,
+                       'emptyFunc': 0,
+                       'aMethod123': 0,
+                       'main': 0,
+                       'methodWithUnnamedReturnStruct': 0,
+                       'shortFunction': 0}
+
+        correct_fout = {'firstFunction': 0,
+                        'bMethodXyz123bb123': 0,
+                        'emptyFunc': 0,
+                        'aMethod123': 0,
+                        'main': 0,
+                        'methodWithUnnamedReturnStruct': 0,
+                        'shortFunction': 0}
+
+        function_list = run_lizard(target_test_file)
+        self.assertDictEqual(correct_fin, {func['name']: func["fan_in"] for func in function_list})
+        self.assertDictEqual(correct_fout, {func['name']: func["fan_out"] for func in function_list})
 
     def test_exclude_python(self):
         self.assertFalse(LizardIndexer.is_analyzable('random.py'))
@@ -96,6 +136,7 @@ class testLizardWrapper(unittest.TestCase):
         self.test_function_names()
         self.test_nloc()
         self.test_mccabe()
+        self.test_nd()
 
 if __name__ == "__main__":
     unittest.main()

@@ -28,7 +28,6 @@ Short description:
 import __init__  # pylint: disable=W0611
 
 DEBUG = True
-TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 SECRET_KEY = 'test_test'
@@ -57,10 +56,15 @@ DATABASES = {
     }
 }
 
-# Context processing, used for finding context urls (navbar)
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'visualization.context_processors.get_all_urls',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        # Context processing, used for finding context urls (navbar)
+        'OPTIONS': {'context_processors' : ['visualization.context_processors.get_all_urls',
+                                            'visualization.context_processors.last_db_update'],
+                    'debug': False}
+    },
+]
 
 REPO_ROOT = __init__.repo_root

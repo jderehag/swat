@@ -41,6 +41,9 @@ METRIC_MAPPING = {'nloc': ChangeMetric.nloc,
                   'token_count': ChangeMetric.token_count,
                   'parameter_count': ChangeMetric.parameter_count,
                   'cyclomatic_complexity': ChangeMetric.cyclomatic_complexity,
+                  'max_nesting_depth': ChangeMetric.max_nesting_depth,
+                  'fan_in': ChangeMetric.fan_in,
+                  'fan_out': ChangeMetric.fan_out,
                   'changerate': ChangeMetric.added + ChangeMetric.changed + ChangeMetric.deleted}
 
 METRICS = {'nloc': {'continuous': True, 'url': '/docs/metrics.md#nloc'},
@@ -51,6 +54,9 @@ METRICS = {'nloc': {'continuous': True, 'url': '/docs/metrics.md#nloc'},
            'token_count': {'continuous': True, 'url': '/docs/metrics.md#number-of-tokens'},
            'parameter_count': {'continuous': True, 'url': '/docs/metrics.md#number-of-parameters'},
            'cyclomatic_complexity': {'continuous': True, 'url': '/docs/metrics.md#mccabes-cyclomatic-complexity'},
+           'max_nesting_depth': {'continuous': True, 'url': '/docs/metrics.md#max_nesting_depth'},
+           'fan_in': {'continuous': True, 'url': '/docs/metrics.md#fan-in'},
+           'fan_out': {'continuous': True, 'url': '/docs/metrics.md#fan-out'},
            'effective_complexity': {'continuous': True, 'url': '/docs/metrics.md#effective-cyclomatic-complexity'},
            'defect_modifications': {'continuous': False, 'url': '/docs/metrics.md#defect-modifications'},
            'revisions': {'continuous': False, 'url': '/docs/metrics.md#revisions'},
@@ -179,7 +185,7 @@ class MetricsDb(object):
 
     def insert_change_metric(self, session, file_, version, function, date_=None, user=None, added=None,
                              changed=None, deleted=None, nloc=None, token_count=None, parameter_count=None,
-                             cyclomatic_complexity=None):
+                             cyclomatic_complexity=None, max_nesting_depth=None, fan_in=None, fan_out=None):
         '''
         Inserts a ChangeMetric into the database, making sure that all files/functions and whatnot is created properly.
         Args:
@@ -221,6 +227,12 @@ class MetricsDb(object):
             cr.parameter_count = parameter_count
         if cyclomatic_complexity is not None:
             cr.cyclomatic_complexity = cyclomatic_complexity
+        if max_nesting_depth is not None:
+            cr.max_nesting_depth = max_nesting_depth
+        if fan_in is not None:
+            cr.fan_in = fan_in
+        if fan_out is not None:
+            cr.fan_out = fan_out
 
     def insert_subsystem_entry(self, session, subsystem, status, maintainers):
         '''

@@ -24,18 +24,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Short description:
 '''
 import os
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 
 from django.conf import settings
 
 import views
 import urls_rest_v0
 
-
-urlprefix = ''
-
-urlpatterns = patterns(
-    urlprefix,
+urlpatterns = [
     # Views that serve html
     url(r'^$', views.treemap_view, name='index'),
     url(r'^treemap/$', views.treemap_view, name='treemapview'),
@@ -54,9 +50,8 @@ urlpatterns = patterns(
     url(r'^lineview_data/$', views.lineview_data, name='lineview_data'),
     url(r'^contributors_defects_data/$', views.contributors_defects_data, name='contributors_defects_data'),
 
-    url(r'api/v0/', include(urls_rest_v0.urlpatterns))
-
-)
+    # API:s
+    url(r'api/v0/', include(urls_rest_v0.urlpatterns))]
 
 
 # Search through /docs/ and exclicitly add all the URL:s to the URL list.
@@ -70,14 +65,14 @@ urlpatterns = patterns(
 # the downside is that you needs to restart django if you create a new .md file.
 # We still read them dynamically though, so any updates inside files can still be done without restarts.
 docs_root = 'docs'
-urlpatterns += patterns(urlprefix, url(r'^{}$'.format(docs_root + '/'), views.docs_folder, name='docsroot'))
+urlpatterns += [url(r'^{}$'.format(docs_root + '/'), views.docs_folder, name='docsroot')]
 for root, dirs, files in os.walk(settings.REPO_ROOT + os.sep + docs_root):
     for file_ in files:
         if file_.endswith(".md"):
             file_ = os.path.join(root, file_).replace(settings.REPO_ROOT + os.sep, "").replace('\\', '/')
-            urlpatterns += patterns(urlprefix, url(r'^(?P<document>{})$'.format(file_), views.docs_markdown))
+            urlpatterns += [url(r'^(?P<document>{})$'.format(file_), views.docs_markdown)]
     for dir_ in dirs:
         dir_ = os.path.join(root, dir_).replace(settings.REPO_ROOT + os.sep, "").replace('\\', '/') + '/'
-        urlpatterns += patterns(urlprefix, url(r'^(?P<dir_>{})$'.format(dir_), views.docs_folder))
+        urlpatterns += [url(r'^(?P<dir_>{})$'.format(dir_), views.docs_folder)]
 
 

@@ -30,6 +30,14 @@ import lizard
 
 from Utils import logger
 
+try:
+    import lizard_languages
+    def _get_reader(file_):
+        return lizard_languages.get_reader_for(file_)  # pylint: disable=E1101
+except ImportError:
+    def _get_reader(file_):
+        return lizard.CodeReader.get_reader(file_)  # pylint: disable=E1101
+
 class _SymbolicFileAnalyzer(lizard.FileAnalyzer):
     def analyze_file(self, file_, file_content=None):
         '''
@@ -38,7 +46,7 @@ class _SymbolicFileAnalyzer(lizard.FileAnalyzer):
         lizard defaults to CLikeReader if no reader is found, to avoid this we explicitly
         check if a reader is found before calling
         '''
-        if lizard.CodeReader.get_reader(file_) is not None:
+        if _get_reader(file_) is not None:
             if file_content is None:
                 with open(file_, 'rU') as f:
                     file_content = f.read()
@@ -58,7 +66,7 @@ class LizardIndexer(object):
         Excluding python is due to a bug in lizard where some of our functions are not scoped correctly
         Somehow leading to a integrity error in the database.
         '''
-        if lizard.CodeReader.get_reader(file_) is not None and not file_.endswith('.py'):
+        if _get_reader(file_) is not None and not file_.endswith('.py'):
             return True
         else:
             return False
@@ -112,7 +120,7 @@ def run_lizard(filename, symbolic_filename_translator=lambda file_: file_, filec
         with open(filename) as f:
             filecontent = f.read()
 
-    fa = _SymbolicFileAnalyzer(extensions=lizard.get_extensions([]))
+    fa = _SymbolicFileAnalyzer(extensions=lizard.get_extensions(['nd', 'io']))
     lizard_object = fa.analyze_file(symbolic_filename_translator(filename), filecontent)
 
     if lizard_object:

@@ -258,6 +258,9 @@ class ChangeMetric(Base):
     token_count = Column(Integer, nullable=True)
     parameter_count = Column(Integer, nullable=True)
     cyclomatic_complexity = Column(Integer, nullable=True)
+    max_nesting_depth = Column(Integer, nullable=True)
+    fan_in = Column(Integer, nullable=True)
+    fan_out = Column(Integer, nullable=True)
 
     __table_args__ = (UniqueConstraint('file_id', 'version_id', 'function_id'),)
 

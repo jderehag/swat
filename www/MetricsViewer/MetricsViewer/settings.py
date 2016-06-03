@@ -45,7 +45,6 @@ import sys
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 DEBUG = False
-TEMPLATE_DEBUG = False
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -87,12 +86,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Context processing, used for finding context urls (navbar)
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.core.context_processors.request',
-    'visualization.context_processors.get_all_urls',
-    'visualization.context_processors.last_db_update'
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        # Context processing, used for finding context urls (navbar)
+        'OPTIONS': {'context_processors' : ['visualization.context_processors.get_all_urls',
+                                            'visualization.context_processors.last_db_update'],
+                    'debug': False}
+    },
+]
 
 # # Load our local_settings
 try:
