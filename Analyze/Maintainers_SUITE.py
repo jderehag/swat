@@ -43,47 +43,48 @@ class testMaintainers(unittest.TestCase):
         try:
             tdir = tempfile.mkdtemp()
 
-            with open(tdir + '/MAINTAINERS', 'w') as f:
-                f.write("""
-[MAIN]
-F:  {0}/main
-[UTILS]
-F:  {0}/utils
-F:  {0}/main/utils
-X:  {0}/main/utils/exception.txt
-[THIRD]
-F:  {0}/main/utils/double.cpp
-[FOURTH]
-F:  {0}/main/utils/double.cpp
-""".format(tdir))
+            mfile_contents = ""
+            mfile_contents += "[MAIN]\n"
+            mfile_contents += "F:  {0}\n".format(os.path.join(tdir, 'main'))
+            mfile_contents += "[UTILS]\n"
+            mfile_contents += "F:  {0}\n".format(os.path.join(tdir, 'utils'))
+            mfile_contents += "F:  {0}\n".format(os.path.join(tdir, 'main', 'utils'))
+            mfile_contents += "X:  {0}\n".format(os.path.join(tdir, 'main', 'utils', 'exception.txt'))
+            mfile_contents += "[THIRD]\n"
+            mfile_contents += "F:  {0}\n".format(os.path.join(tdir, 'main', 'utils', 'double.cpp'))
+            mfile_contents += "[FOURTH]\n"
+            mfile_contents += "F:  {0}\n".format(os.path.join(tdir, 'main', 'utils', 'double.cpp'))
+            with open(os.path.join(tdir, 'MAINTAINERS'), 'w') as f:
+                f.write(mfile_contents)
 
-            touch(tdir + '/main/main.cpp') # MAIN
-            touch(tdir + '/main/utils/main_utils.cpp') # UTILS (more specific than MAIN)
-            touch(tdir + '/unmaintained.cpp') # no maintainer
-            touch(tdir + '/ignored.cpp') # ignored (not included below)
-            touch(tdir + '/utils/utils.cpp') # UTILS
-            touch(tdir + '/main/utils/exception.txt') # MAIN (since excluded by UTIL)
-            touch(tdir + '/main/utils/double.cpp') # THIRD and FOURTH
+            touch(os.path.join(tdir, 'main', 'main.cpp')) # MAIN
+            touch(os.path.join(tdir, 'main', 'utils', 'main_utils.cpp')) # UTILS (more specific than MAIN)
+            touch(os.path.join(tdir, 'unmaintained.cpp')) # no maintainer
+            touch(os.path.join(tdir, 'ignored.cpp')) # ignored (not included below)
+            touch(os.path.join(tdir, 'utils', 'utils.cpp')) # UTILS
+            touch(os.path.join(tdir, 'main', 'utils', 'exception.txt')) # MAIN (since excluded by UTIL)
+            touch(os.path.join(tdir, 'main', 'utils', 'double.cpp')) # THIRD and FOURTH
 
-            m = Maintainers.Maintainers(tdir + '/MAINTAINERS')
+            m = Maintainers.Maintainers(os.path.join(tdir, 'MAINTAINERS'))
 
             no, multi = m.verify_maintainers([
-                    tdir + '/main/main.cpp',
-                    tdir + '/main/utils/main_utils.cpp',
-                    tdir + '/unmaintained.cpp',
-                    tdir + '/utils/utils.cpp',
-                    tdir + '/main/utils/exception.txt',
-                    tdir + '/main/utils/double.cpp',
+                    os.path.join(tdir, 'main', 'main.cpp'),
+                    os.path.join(tdir, 'main', 'utils', 'main_utils.cpp'),
+                    os.path.join(tdir, 'unmaintained.cpp'),
+                    os.path.join(tdir, 'utils', 'utils.cpp'),
+                    os.path.join(tdir, 'main', 'utils', 'exception.txt'),
+                    os.path.join(tdir, 'main', 'utils', 'double.cpp'),
                     ])
 
-            self.assertEqual(no, [tdir + '/unmaintained.cpp'])
-            self.assertEqual(multi, [tdir + '/main/utils/double.cpp'])
+            self.assertEqual(no, [os.path.join(tdir, 'unmaintained.cpp')])
+            self.assertEqual(multi, [os.path.join(tdir, 'main', 'utils', 'double.cpp')])
 
-            self.assertEqual(m.find_matching_maintainers(tdir + '/main/main.cpp')[0]['subsystem'], 'MAIN')
-            self.assertEqual(m.find_matching_maintainers(tdir + '/main/utils/main_utils.cpp')[0]['subsystem'], 'UTILS')
-            self.assertEqual(m.find_matching_maintainers(tdir + '/utils/utils.cpp')[0]['subsystem'], 'UTILS')
-            self.assertEqual(m.find_matching_maintainers(tdir + '/main/utils/exception.txt')[0]['subsystem'], 'MAIN')
-            self.assertEqual([me['subsystem'] for me in m.find_matching_maintainers(tdir + '/main/utils/double.cpp')], ['THIRD', 'FOURTH'])
+            self.assertEqual(m.find_matching_maintainers(os.path.join(tdir, 'main', 'main.cpp)'))[0]['subsystem'], 'MAIN')
+            self.assertEqual(m.find_matching_maintainers(os.path.join(tdir, 'main', 'utils', 'main_utils.cpp'))[0]['subsystem'], 'UTILS')
+            self.assertEqual(m.find_matching_maintainers(os.path.join(tdir, 'utils', 'utils.cpp'))[0]['subsystem'], 'UTILS')
+            self.assertEqual(m.find_matching_maintainers(os.path.join(tdir, 'main', 'utils', 'exception.txt'))[0]['subsystem'], 'MAIN')
+            self.assertEqual([me['subsystem'] for me in m.find_matching_maintainers(os.path.join(tdir, 'main', 'utils', 'double.cpp'))],
+                             ['THIRD', 'FOURTH'])
 
         finally:
             shutil.rmtree(tdir)

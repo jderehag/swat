@@ -31,7 +31,7 @@ from Analyze import EnvParser
 import codecs
 
 
-class Rule(object):
+class _Rule(object):
     """
     A rule consists of a path and a rule type (include/exclude),
     and a reference to the maintainer_entry that the rule belongs to
@@ -42,7 +42,7 @@ class Rule(object):
         if path.endswith('/'):
             path = path[:-1]
 
-        # This variable is only used during initialization, to put the rule in the right RuleTreeNode
+        # This variable is only used during initialization, to put the rule in the right _RuleTreeNode
         self.path_components = path.split('/')
 
         self.maintainer_entry = maintainer_entry
@@ -51,7 +51,7 @@ class Rule(object):
         assert self.include or self.exclude
 
 
-class RuleTreeNode(object):
+class _RuleTreeNode(object):
     """
     A node in a tree that represents the set of rules in a maintainer file.
     Each node corresponds to a file or a directory in the file system,
@@ -82,7 +82,7 @@ class RuleTreeNode(object):
             if child.name == first:
                 child.insert(rule, path_components[1:])
                 return
-        new_child = RuleTreeNode(first, self, [])
+        new_child = _RuleTreeNode(first, self, [])
         new_child.insert(rule, path_components[1:])
         self.children.append(new_child)
 
@@ -100,7 +100,7 @@ class RuleTreeNode(object):
         return self
 
 
-class RuleEvaluator(object):
+class _RuleEvaluator(object):
     """
     Evaluates which maintainer entry(ies) is active for a set of rules.
     This is used by going step by step from the root directory to the
@@ -111,10 +111,15 @@ class RuleEvaluator(object):
     def __init__(self, other=None):
         self._maint_entries_list = []
         if other: # deep copy
-            for me in other._maint_entries_list:
+            for me in other.get_maintainer_entries_list():
                 self._maint_entries_list.append(list(me))
 
+    def get_maintainer_entries_list(self):
+        "Returns the list of maintainer entries"
+        return self._maint_entries_list
+
     def add_rules(self, rules):
+        "Adds a set of rules, which will have higher precedence than previous ones"
         new_maint_entries = []
         for rule in rules:
             if rule.include:
@@ -125,19 +130,21 @@ class RuleEvaluator(object):
         self._maint_entries_list.append(new_maint_entries)
 
     def get_active_maintainer_entries(self):
+        "Returns list of currently active maintainer entries"
         for maint_entries in reversed(self._maint_entries_list):
             if maint_entries:
                 return maint_entries
         return []
 
 
-class VerifyResult(object):
+class _VerifyResult(object):
+    "Stores the paths that failed verification"
     def __init__(self):
         self.no_maintainer = []
         self.multiple_maintainers = []
 
 
-def find_matching_maintainer(node):
+def _find_matching_maintainer(node):
     """
     Finds the maintainer entry(ies) for a specific node.
     """
@@ -146,13 +153,13 @@ def find_matching_maintainer(node):
         nodes.insert(0, node)
         node = node.parent
 
-    evaluator = RuleEvaluator()
+    evaluator = _RuleEvaluator()
     for n in nodes:
         evaluator.add_rules(n.rules)
     return evaluator.get_active_maintainer_entries()
 
 
-def verify(node, path, files, evaluator, result):
+def _verify(node, path, files, evaluator, result):
     """
     Finds all files/directories that have either zero or several equally matching maintainer_entry's.
 
@@ -160,19 +167,19 @@ def verify(node, path, files, evaluator, result):
     are not in the 'files' list.
 
     Args:
-        node:      The RuleTreeNode where the search starts
+        node:      The _RuleTreeNode where the search starts
         path:      The file system path of 'node'
         files:     A list of all applicable file paths, any files founds not in this list are ignored
-        evaluator: RuleEvaluator (already initialized with the rules of any parent nodes)
-        result:    VerifyResult output parameter
+        evaluator: _RuleEvaluator (already initialized with the rules of any parent nodes)
+        result:    _VerifyResult output parameter
     """
 
-    # This turned out to be quite a bit faster than using os.path.join()
-    def join(path, c):
-        if path == '/':
-            return path + c
+    def join(path, filename):
+        "Like os.path.join(), but faster for some reason"
+        if path == os.path.sep:
+            return path + filename
         else:
-            return path + '/' + c
+            return path + os.path.sep + filename
 
     # Update the evaluator with current node, and get the number of active maintainer entries
     evaluator.add_rules(node.rules)
@@ -181,7 +188,7 @@ def verify(node, path, files, evaluator, result):
     def check_add_path(path):
         "Adds a path to a output list if necessary"
         if num_active_maintainer_entries != 1:
-            if any(f.startswith(path) for f in files):
+            if path in files:
                 error_list = result.no_maintainer if num_active_maintainer_entries == 0 else result.multiple_maintainers
                 error_list.append(path)
 
@@ -192,7 +199,7 @@ def verify(node, path, files, evaluator, result):
                 # Check all child rules that refers to existing files
                 for node_child in node.children:
                     if node_child.name in children:
-                        verify(node_child, join(path, node_child.name), files, RuleEvaluator(evaluator), result)
+                        _verify(node_child, join(path, node_child.name), files, _RuleEvaluator(evaluator), result)
             # Check all existing files that does not have explicit rules
             for child in children:
                 if not child in [c.name for c in node.children]:
@@ -231,39 +238,7 @@ class Maintainers(object):
                         maintainerfile.append(line.strip().encode('utf-8'))
         self._read_maintainer_scopes(maintainerfile)
         self._verify_paths()
-        self._make_rule_tree()
-
-    def _make_rule_tree(self):
-        self._tree = RuleTreeNode('', None, [])
-        for maint in self.get_maintainer_list():
-            for pattern in maint['file-include-pattern']:
-                for path in glob.glob(pattern):
-                    self._tree.insert(Rule(path, maint, 'include'))
-            for pattern in maint['file-exclude-pattern']:
-                for path in glob.glob(pattern):
-                    self._tree.insert(Rule(path, maint, 'exclude'))
-
-    def _verify_paths(self):
-        is_ok = True
-
-        filepaths = []
-        for maint in self.get_maintainer_list():
-            filepaths.extend(maint['file-include-pattern'])
-            filepaths.extend(maint['file-exclude-pattern'])
-
-        all_envs = {}
-        for path in filepaths:
-            match = re.match(r'.*\$(\w+).*', path)
-            if match is not None and match.group(1) is not None:
-                all_envs[match.group(1)] = None
-
-        for env in all_envs.iterkeys():
-            if env not in os.environ:
-                logger.critical("Could not find $%s envrionment variable! Perhaps you need to run setup_workspace?",
-                                env)
-                is_ok = False
-
-        assert is_ok
+        self._tree = self._make_rule_tree()
 
     def get_maintainer_list(self):
         """
@@ -313,8 +288,8 @@ class Maintainers(object):
         """
         Verifies that each file is covered by exactly one subsystem
         """
-        result = VerifyResult()
-        verify(self._tree, '/', files, RuleEvaluator(), result)
+        result = _VerifyResult()
+        _verify(self._tree, '/', files, _RuleEvaluator(), result)
         return result.no_maintainer, result.multiple_maintainers
 
     def find_matching_maintainers(self, filename):
@@ -342,7 +317,7 @@ class Maintainers(object):
             filename = filename[1:]
         path_components = filename.split('/')
         node = self._tree.find_best_match(path_components)
-        mes = find_matching_maintainer(node)
+        mes = _find_matching_maintainer(node)
         return mes
 
     def _read_maintainer_scopes(self, text):
@@ -394,3 +369,36 @@ class Maintainers(object):
             else:
                 logger.warn("Unable to intrpret line %s [must start with one of [MLSFX :[%s]", lnumber, line)
         return maintainer
+
+    def _verify_paths(self):
+        is_ok = True
+
+        filepaths = []
+        for maint in self.get_maintainer_list():
+            filepaths.extend(maint['file-include-pattern'])
+            filepaths.extend(maint['file-exclude-pattern'])
+
+        all_envs = {}
+        for path in filepaths:
+            match = re.match(r'.*\$(\w+).*', path)
+            if match is not None and match.group(1) is not None:
+                all_envs[match.group(1)] = None
+
+        for env in all_envs.iterkeys():
+            if env not in os.environ:
+                logger.critical("Could not find $%s envrionment variable! Perhaps you need to run setup_workspace?",
+                                env)
+                is_ok = False
+
+        assert is_ok
+
+    def _make_rule_tree(self):
+        tree = _RuleTreeNode('', None, [])
+        for maint in self.get_maintainer_list():
+            for pattern in maint['file-include-pattern']:
+                for path in glob.glob(pattern):
+                    tree.insert(_Rule(path, maint, 'include'))
+            for pattern in maint['file-exclude-pattern']:
+                for path in glob.glob(pattern):
+                    tree.insert(_Rule(path, maint, 'exclude'))
+        return tree
