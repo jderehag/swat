@@ -87,8 +87,8 @@ def _main():
             for maintainer in maintainers:
                 print "\tSubsystem:\t", maintainer['subsystem']
                 print "\tMaintainer:\t",
-                for person, email in maintainer['maintainer']:
-                    print person, "<", email, ">"
+                print "\n\t           \t".join(["{0} < {1} >".format(person, email)
+                                              for person, email in maintainer['maintainer']])
                 print "\tMaillist:\t", maintainer['maillist']
                 print "\tStatus:\t\t", maintainer['status']
 
