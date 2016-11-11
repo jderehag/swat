@@ -341,7 +341,6 @@ class Git(VcsWrapperContract):
             None
         """
         self._setup_git(file_)
-        file_ = os.path.normpath(os.path.realpath(file_))
         filealias = self._get_filealias(file_, version)
 
         # _git show requires that the path to the file is relative to the repo top dir (no absolute paths)
