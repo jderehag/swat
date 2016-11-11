@@ -55,8 +55,8 @@ class Git(VcsWrapperContract):
         self._tmpfiles = []
         self._filealias_cache = shared_dict_ctor()
 
-        self._repo = config.get('Git', 'repo_root')
-        self._current_branch = self._git('rev-parse --abbrev-ref HEAD')
+        self._repo = None
+        self._current_branch = None
 
         self._ignore_users = config.getlist('General', 'ignore_elements_by_user', ())
 
@@ -90,6 +90,11 @@ class Git(VcsWrapperContract):
         self.uncheckout_file_version()
         self.uncheckout_repo_version()
 
+    def _setup_git(self, file_):
+        if self._repo is None:
+            self._repo = self._get_repo_top_dir(file_)
+            self._current_branch = self._git('rev-parse --abbrev-ref HEAD')
+
     def _git(self, args, with_errno=False):
         if isinstance(args, str):
             args = args.split(' ')
@@ -116,7 +121,7 @@ class Git(VcsWrapperContract):
         Raises:
             None
         """
-
+        self._setup_git(file_)
         contributions = self.get_lsv_versions(file_, since_date)
 
         ackumulated_entries = {}
@@ -155,6 +160,7 @@ class Git(VcsWrapperContract):
         Raises:
             None
         """
+        self._setup_git(file_)
         defects = self._find_defects_in_commit_history(file_, since_date)
         if changeinfo:
             for defect_list in defects.itervalues():
@@ -210,6 +216,7 @@ class Git(VcsWrapperContract):
         Raises:
             None
         """
+        self._setup_git(file_)
         if regexstr is not None:
             '''
              --grep dont seem to work together with --follow
@@ -333,12 +340,12 @@ class Git(VcsWrapperContract):
         Raises:
             None
         """
-
+        self._setup_git(file_)
         file_ = os.path.normpath(os.path.realpath(file_))
         filealias = self._get_filealias(file_, version)
 
         # _git show requires that the path to the file is relative to the repo top dir (no absolute paths)
-        relfile = filealias.replace(self._get_repo_top_dir() + "/", "")
+        relfile = filealias.replace(self._get_repo_top_dir(file_) + os.path.sep, "")
         output = self._git('show ' + version + ':' + relfile)
 
         '''
@@ -424,8 +431,12 @@ class Git(VcsWrapperContract):
             self._git('checkout -f ' + self._current_branch)
             self._is_branch_checkedout = False
 
-    def _get_repo_top_dir(self):
-        return self._git('rev-parse --show-toplevel')
+    def _get_repo_top_dir(self, file_):
+        cwd = os.getcwd()
+        os.chdir(os.path.dirname(file_))
+        top_dir = self._git('rev-parse --show-toplevel')
+        os.chdir(cwd)
+        return top_dir
 
     def _find_defects_in_commit_history(self, file_, since_date=None):
         defects = {}
