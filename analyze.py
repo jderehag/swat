@@ -110,7 +110,7 @@ def _main():
     """
     if config_update_repo:
         logger.info('Updating repo prior to analysis...')
-        vcs.update_repo()
+        vcs.update_repo(repo_root=config.get('Git', 'repo_root'))
         logger.info('Updating repo done')
 
     start = datetime.now()

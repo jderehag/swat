@@ -91,7 +91,7 @@ class VcsWrapperContract(object):
         """
         raise NotImplementedError("A VCS implementation must implement this!")
 
-    def update_repo(self):
+    def update_repo(self, repo_root):
         """
         Updates repo to latest version of set branch.
         CC: cleartool setcs --stream

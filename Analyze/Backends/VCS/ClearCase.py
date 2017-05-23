@@ -203,7 +203,7 @@ class ClearCase(VcsWrapperContract):
         """
         return file_ + "@@" + version
 
-    def update_repo(self):
+    def update_repo(self, _):
         """
         Updates view to the stream config-spec.
         i.e, calls:

@@ -95,10 +95,12 @@ class Git(VcsWrapperContract):
             self._repo = self._get_repo_top_dir(file_)
             self._current_branch = self._git('rev-parse --abbrev-ref HEAD')
 
-    def _git(self, args, with_errno=False):
+    def _git(self, args, with_errno=False, cwd=None):
         if isinstance(args, str):
             args = args.split(' ')
-        output = sysutils.call_subprocess([self._path_to_git] + args, with_errno=with_errno, cwd=self._repo)
+        if cwd is None:
+            cwd = self._repo
+        output = sysutils.call_subprocess([self._path_to_git] + args, with_errno=with_errno, cwd=cwd)
 
         if with_errno:
             output = output[0], output[1].strip()
@@ -295,7 +297,7 @@ class Git(VcsWrapperContract):
         '''
         return file_
 
-    def update_repo(self):
+    def update_repo(self, repo_root=None):
         """
         Updates repo to latest version of set branch.
         i.e, calls:
@@ -309,12 +311,12 @@ class Git(VcsWrapperContract):
         """
         logger.debug('Running git pull on %s',)
         acc_rc = 0
-        rc, _ = self._git('pull --recurse-submodules=yes', with_errno=True)
+        rc, _ = self._git('pull --recurse-submodules=yes', with_errno=True, cwd=repo_root)
         acc_rc = acc_rc | rc
 
         logger.debug('_git pull done...')
 
-        rc, _ = self._git('submodule update --init', with_errno=True)
+        rc, _ = self._git('submodule update --init', with_errno=True, cwd=repo_root)
         acc_rc = acc_rc | rc
 
         if rc != 0:
