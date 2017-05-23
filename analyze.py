@@ -141,7 +141,7 @@ def _main():
                 # subtract an extra day to make sure that we dont miss anything during the overlap of the analysis
                 last_metric_update = last_metric_update - timedelta(days=1)
 
-        all_files = walker.find_all_files_in_srcroots()
+            all_files = walker.find_all_files_in_srcroots()
         logger.info("Found %s files!", len(all_files))
 
         if len(all_files) != 0:
@@ -246,7 +246,7 @@ def _lookup_metrics(pool, walker, vcs, db, files, last_update, config_transforme
             for function, (added, changed, deleted, nloc) in changerates.iteritems():
                 if function not in complexity:
                     if file_.endswith((".c", ".cc", ".cpp", ".h", ".hpp")):
-                        logger.debug("%s Could not find complexity function %s", file_, function)
+                        logger.debug("%s Could not find complexity function \"%s\"", file_, function)
                         logger.debug("%s Available functions:", os.path.basename(file_))
                         for func in complexity.iterkeys():
                             logger.debug("%s", func)
@@ -254,6 +254,9 @@ def _lookup_metrics(pool, walker, vcs, db, files, last_update, config_transforme
                     cyclomatic_complexity = None
                     tokens = None
                     parameter_count = None
+                    max_nd = None
+                    fin = None
+                    fout = None
                 else:
                     cyclomatic_complexity, tokens, parameter_count, max_nd, fin, fout = complexity[function]
 
