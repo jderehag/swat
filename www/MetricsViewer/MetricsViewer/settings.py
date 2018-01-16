@@ -36,11 +36,10 @@ Short description:
 
   Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 '''
-
-import __init__  # pylint: disable=W0611
-
 import os
 import sys
+
+import __init__  # pylint: disable=W0611
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -91,8 +90,9 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
         # Context processing, used for finding context urls (navbar)
-        'OPTIONS': {'context_processors' : ['visualization.context_processors.get_all_urls',
-                                            'visualization.context_processors.last_db_update'],
+        'OPTIONS': {'context_processors': ['visualization.context_processors.get_all_urls',
+                                           'visualization.context_processors.last_db_update',
+                                           'django.template.context_processors.request'],
                     'debug': False}
     },
 ]
