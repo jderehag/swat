@@ -53,6 +53,6 @@ class EnvPathParser(object):
         Takes an absolute path and translates it into original form including env. variables
         '''
         for envname, envpath in self._translated_envs.iteritems():
-            if envpath in path:
+            if len(envpath) > 0 and envpath in path:
                 path = path.replace(envpath, "$" + envname)
         return path
